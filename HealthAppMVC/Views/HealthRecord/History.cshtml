@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "History";
+}
+
+<h2>History</h2>
+@model IEnumerable<HealthAppMVC.Models.HealthRecord>
+
+@{
+    ViewBag.Title = "Patient Health History";
+}
+
+<h2>Patient Health History</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Visit Date</th>
+            <th>Doctor</th>
+            <th>Specialisation</th>
+            <th>Diagnosis</th>
+            <th>Prescription</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.VisitDate
+                </td>
+
+                <td>
+                    @item.DoctorName
+                </td>
+
+                <td>
+                    @item.Specialisation
+                </td>
+
+                <td>
+                    @item.Diagnosis
+                </td>
+
+                <td>
+                    @item.Prescription
+                </td>
+
+                <td>
+                    @Html.ActionLink(
+                        "View",
+                        "Details",
+                        new
+                        {
+                            id = item.RecordId
+                        },
+                        new
+                        {
+                            @class =
+                            "btn btn-primary btn-sm"
+                        })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
