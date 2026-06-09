@@ -88,20 +88,20 @@ namespace HealthAppWebAPI.Repositories.Impl
                     DbFunctions.TruncateTime(date) &&
                     a.Status != AppointmentStatus.Cancelled.ToString());
         }
-
-        public async Task<List<Appointment>> GetUpcomingConfirmedAppointmentsByDoctorAsync(
-            int doctorId)
+        public async Task<List<Appointment>> GetUpcomingAppointmentsByDoctorAsync(int doctorId)
         {
             return await _context.Appointments
                 .Include(a => a.Patient)
                 .Include(a => a.Doctor)
                 .Where(a =>
                     a.DoctorId == doctorId &&
-                    a.Status == AppointmentStatus.Confirmed.ToString() &&
+                    (a.Status == AppointmentStatus.Confirmed.ToString() ||
+                     a.Status == AppointmentStatus.Pending.ToString()) &&
                     a.ScheduledDate >= DateTime.Today)
                 .OrderBy(a => a.ScheduledDate)
                 .ToListAsync();
         }
+
         public async Task<List<Appointment>> GetAppointmentsByPatientAsync(
             int patientId)
         {

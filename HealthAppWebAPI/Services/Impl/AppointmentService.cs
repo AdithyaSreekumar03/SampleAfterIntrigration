@@ -36,7 +36,7 @@ namespace HealthAppWebAPI.Services.Impl
         public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForDoctorAsync(int doctorId)
         {
             var appointments = await _repo
-                .GetUpcomingConfirmedAppointmentsByDoctorAsync(doctorId);
+                .GetUpcomingAppointmentsByDoctorAsync(doctorId);
 
             return _mapper.Map<List<AppointmentDto>>(appointments);
         }

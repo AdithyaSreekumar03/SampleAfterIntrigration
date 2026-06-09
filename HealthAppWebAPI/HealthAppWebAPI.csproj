@@ -196,6 +196,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Handlers\GlobalExceptionHandler.cs" />
     <Compile Include="HealthRecord.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -216,15 +217,6 @@
     </Compile>
     <Compile Include="Models\Appointment.cs" />
     <Compile Include="Models\Doctor.cs" />
-    <Compile Include="Models\Dtos\AppointmentDto.cs" />
-    <Compile Include="Models\Dtos\CancelAppointmentDto.cs" />
-    <Compile Include="Models\Dtos\CreateAppointmentDto.cs" />
-    <Compile Include="Models\Dtos\CreateDoctorDto.cs" />
-    <Compile Include="Models\Dtos\CreateHealthRecordDto.cs" />
-    <Compile Include="Models\Dtos\CreatePatientDto.cs" />
-    <Compile Include="Models\Dtos\DoctorDto.cs" />
-    <Compile Include="Models\Dtos\HealthRecordDto.cs" />
-    <Compile Include="Models\Dtos\PatientDto.cs" />
     <Compile Include="Models\HealthRecord.cs" />
     <Compile Include="Patient.cs">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -307,6 +299,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HealthApp.Shared\HealthApp.Shared.csproj">
+      <Project>{7c14763c-6946-47db-a48e-c9fd1281a989}</Project>
+      <Name>HealthApp.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

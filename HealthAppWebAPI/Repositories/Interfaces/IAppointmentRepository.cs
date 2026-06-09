@@ -31,7 +31,7 @@ namespace HealthAppWebAPI.Repositories.Interfaces
             int doctorId,
             DateTime date);
 
-        Task<List<Appointment>> GetUpcomingConfirmedAppointmentsByDoctorAsync(
+        Task<List<Appointment>> GetUpcomingAppointmentsByDoctorAsync(
             int doctorId);
 
         Task<List<Appointment>> GetAppointmentsByPatientAsync(

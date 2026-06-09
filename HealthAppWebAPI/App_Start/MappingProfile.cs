@@ -21,7 +21,6 @@ namespace HealthAppWebAPI.App_Start
                             .ForMember(dest => dest.ScheduledDate,
                                 opt => opt.MapFrom(src => src.ScheduledDate.ToShortDateString()));
 
-            // ===== Doctor =====
             CreateMap<Doctor, DoctorDto>()
                 .ForMember(dest => dest.Specialisation,
                     opt => opt.MapFrom(src => src.Specialisation.ToString()));
@@ -30,14 +29,12 @@ namespace HealthAppWebAPI.App_Start
                 .ForMember(dest => dest.Specialisation,
                     opt => opt.Ignore());
 
-            // ===== HealthRecord =====
             CreateMap<HealthRecord, HealthRecordDto>()
                 .ForMember(dest => dest.PatientName,
                     opt => opt.MapFrom(src => src.Appointment.Patient.FullName))
                 .ForMember(dest => dest.DoctorName,
                     opt => opt.MapFrom(src => src.Appointment.Doctor.FullName));
 
-            // ===== Patient =====
             CreateMap<Patient, PatientDto>()
                 .ForMember(dest => dest.Gender,
                     opt => opt.MapFrom(src => src.Gender.ToString()));
