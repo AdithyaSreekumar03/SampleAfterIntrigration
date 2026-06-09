@@ -11,14 +11,12 @@ namespace HealthAppWebAPI.Repositories.Interfaces
 
     public interface IHealthRecordRepository
     {
-        Task<HealthRecord> AddAsync(HealthRecord record);
-
         Task<List<HealthRecord>> GetAllAsync();
 
         Task<HealthRecord> GetByIdAsync(int id);
 
-        Task<bool> DeleteAsync(int id);
+        Task<HealthRecord> GetByAppointmentIdAsync(int appointmentId);
 
-        Task UpdateAsync(HealthRecord record);
+        Task AddAsync(HealthRecord record);
     }
 }

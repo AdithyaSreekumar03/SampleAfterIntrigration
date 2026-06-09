@@ -16,25 +16,25 @@ namespace HealthAppWebAPI
 		{
 			var container = new UnityContainer();
 
-			container.RegisterType<AppDbContext>();
+			container.RegisterType<HealthAppDbContext>();
 			container.RegisterType<IDoctorRepository, DoctorRepository>();
 			container.RegisterType
 				<IPatientRepository, PatientRepository>();
 
 			container.RegisterType
-				<IPatientService, PatientServiceImpl>();
+				<IPatientService, PatientService>();
 
 			container.RegisterType
 				<IDoctorRepository, DoctorRepository>();
 
-			//container.RegisterType<IDoctorService, DoctorService>();
+			container.RegisterType<IDoctorService, DoctorService>();
 
 			container.RegisterType<IAppointmentRepository, AppointmentRepository>();
 
-			//container.RegisterType<IAppointmentService, AppointmentService>();
+			container.RegisterType<IAppointmentService, AppointmentService>();
 
 			container.RegisterType<IHealthRecordRepository, HealthRecordRepository>();
-			//container.RegisterType<IHealthRecordService, HealthRecordService>();
+			container.RegisterType<IHealthRecordService, HealthRecordService>();
 
 			var mappingConfig = new MapperConfiguration(config =>
 			{

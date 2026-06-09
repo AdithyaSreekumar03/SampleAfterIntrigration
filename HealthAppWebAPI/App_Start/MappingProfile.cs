@@ -11,20 +11,41 @@ namespace HealthAppWebAPI.App_Start
     {
         public MappingProfile()
         {
-            CreateMap<Doctor, DoctorDto>();
-            CreateMap<DoctorDto, Doctor>();
+            CreateMap<Appointment, AppointmentDto>()
+                            .ForMember(dest => dest.PatientName,
+                                opt => opt.MapFrom(src => src.Patient.FullName))
+                            .ForMember(dest => dest.DoctorName,
+                                opt => opt.MapFrom(src => src.Doctor.FullName))
+                            .ForMember(dest => dest.Status,
+                                opt => opt.MapFrom(src => src.Status.ToString()))
+                            .ForMember(dest => dest.ScheduledDate,
+                                opt => opt.MapFrom(src => src.ScheduledDate.ToShortDateString()));
 
-            // Use the root-level Patient class (from Entity Framework), not Models.Patient
-            CreateMap<Patient, PatientDto>();
-            CreateMap<PatientDto, Patient>();
+            // ===== Doctor =====
+            CreateMap<Doctor, DoctorDto>()
+                .ForMember(dest => dest.Specialisation,
+                    opt => opt.MapFrom(src => src.Specialisation.ToString()));
 
-            CreateMap<Appointment, AppointmentDto>();
-            CreateMap<AppointmentDto, Appointment>();
+            CreateMap<CreateDoctorDto, Doctor>()
+                .ForMember(dest => dest.Specialisation,
+                    opt => opt.Ignore());
 
-            CreateMap<HealthRecord, HealthRecordsDto>();
-            CreateMap<HealthRecordsDto, HealthRecord>();
+            // ===== HealthRecord =====
+            CreateMap<HealthRecord, HealthRecordDto>()
+                .ForMember(dest => dest.PatientName,
+                    opt => opt.MapFrom(src => src.Appointment.Patient.FullName))
+                .ForMember(dest => dest.DoctorName,
+                    opt => opt.MapFrom(src => src.Appointment.Doctor.FullName));
+
+            // ===== Patient =====
+            CreateMap<Patient, PatientDto>()
+                .ForMember(dest => dest.Gender,
+                    opt => opt.MapFrom(src => src.Gender.ToString()));
+
+            CreateMap<CreatePatientDto, Patient>()
+                .ForMember(dest => dest.Gender,
+                    opt => opt.Ignore());
         }
-
     }
 
 }

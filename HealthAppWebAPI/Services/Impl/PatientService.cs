@@ -4,7 +4,6 @@ using HealthAppWebAPI.Repositories.Interfaces;
 using HealthAppWebAPI.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -12,66 +11,80 @@ using System.Web;
 namespace HealthAppWebAPI.Services.Impl
 {
 
-    public class PatientServiceImpl : IPatientService
+    using AutoMapper;
+    using HealthAppMVC.Enums;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    public class PatientService : IPatientService
     {
-        private readonly IPatientRepository _repository;
+        private readonly IPatientRepository _repo;
         private readonly IMapper _mapper;
 
-        public PatientServiceImpl(IPatientRepository repository, IMapper mapper)
+        public PatientService(
+            IPatientRepository repo,
+            IMapper mapper)
         {
-            _repository = repository;
+            _repo = repo;
             _mapper = mapper;
         }
 
-        public async Task<PatientDto> AddPatient(PatientDto entity)
+        public async Task<List<PatientDto>> GetAllPatientsAsync()
         {
-            var patient = _mapper.Map<Patient>(entity);
-
-            var savedEntity = await _repository.AddAsync(patient);
-
-            return _mapper.Map<PatientDto>(savedEntity);
-        }
-
-        public async Task<List<PatientDto>> GetAllPatients()
-        {
-            var patients = await _repository.GetAllAsync();
-
+            var patients = await _repo.GetAllAsync();
             return _mapper.Map<List<PatientDto>>(patients);
         }
 
-        public async Task<PatientDto> GetById(int patientId)
+        public async Task<PatientDto> GetPatientByIdAsync(int id)
         {
-            var patient = await _repository.GetByIdAsync(patientId);
+            var patient = await _repo.GetByIdAsync(id);
+
+            if (patient == null)
+                return null;
 
             return _mapper.Map<PatientDto>(patient);
         }
 
-        public async Task<PatientDto> UpdatePatient(int id, PatientDto entity)
+        public async Task RegisterPatientAsync(CreatePatientDto dto)
         {
-            var patient = _mapper.Map<Patient>(entity);
+            if (dto.DateOfBirth > DateTime.Today)
+                throw new Exception("Future date is not allowed.");
 
-            await _repository.UpdateAsync(patient);
+            var patient = _mapper.Map<Patient>(dto);
 
-            // get updated entity again (optional but good practice)
-            var updatedPatient = await _repository.GetByIdAsync(id);
+            var gender = (GenderType)Enum.Parse(
+                typeof(GenderType),
+                dto.Gender,
+                true);
 
-            return _mapper.Map<PatientDto>(updatedPatient);
+            patient.Gender = gender.ToString();
+
+
+            patient.CreatedDate = DateTime.Now;
+
+            await _repo.AddAsync(patient);
         }
 
-        public async Task<bool> DeletePatient(int id)
+        public async Task UpdatePatientAsync(int id, CreatePatientDto dto)
         {
-            return await _repository.DeleteAsync(id);
-        }
+            var patient = await _repo.GetByIdAsync(id);
 
-        public async Task<bool> EmailExists(string email)
-        {
-            return await _repository.EmailExistsAsync(email);
-        }
+            if (patient == null)
+                throw new Exception("Patient not found.");
 
-        public async Task<int> GetAppointmentCount(int patientId)
-        {
-            return await _repository.GetAppointmentCountAsync(patientId);
-        }
+            _mapper.Map(dto, patient);
 
+
+            var gender = (GenderType)Enum.Parse(
+                typeof(GenderType),
+                dto.Gender,
+                true);
+
+            patient.Gender = gender.ToString();
+
+
+            await _repo.UpdateAsync(patient);
+        }
     }
 }

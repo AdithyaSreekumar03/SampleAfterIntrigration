@@ -8,21 +8,18 @@ using System.Threading.Tasks;
 namespace HealthAppWebAPI.Services.Interfaces
 {
 
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     public interface IPatientService
     {
-        Task<PatientDto> AddPatient(PatientDto entity);
+        Task<List<PatientDto>> GetAllPatientsAsync();
 
-        Task<List<PatientDto>> GetAllPatients();
+        Task<PatientDto> GetPatientByIdAsync(int id);
 
-        Task<PatientDto> GetById(int patientId);
+        Task RegisterPatientAsync(CreatePatientDto dto);
 
-        Task<PatientDto> UpdatePatient(int id, PatientDto entity);
-
-        Task<bool> DeletePatient(int id);
-
-        Task<bool> EmailExists(string email);
-
-        Task<int> GetAppointmentCount(int patientId);
+        Task UpdatePatientAsync(int id, CreatePatientDto dto);
     }
 
 }

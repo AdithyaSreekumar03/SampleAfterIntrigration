@@ -18,7 +18,6 @@ namespace HealthAppWebAPI
         public Patient()
         {
             this.Appointments = new HashSet<Appointment>();
-            this.HealthRecords = new HashSet<HealthRecord>();
         }
     
         public int PatientId { get; set; }
@@ -32,7 +31,5 @@ namespace HealthAppWebAPI
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointments { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<HealthRecord> HealthRecords { get; set; }
     }
 }

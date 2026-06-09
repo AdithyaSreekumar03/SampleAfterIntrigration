@@ -14,15 +14,23 @@ namespace HealthAppWebAPI
     
     public partial class Appointment
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Appointment()
+        {
+            this.HealthRecords = new HashSet<HealthRecord>();
+        }
+    
         public int AppointmentId { get; set; }
         public Nullable<int> PatientId { get; set; }
         public Nullable<int> DoctorId { get; set; }
-        public Nullable<System.DateTime> ScheduledDate { get; set; }
+        public System.DateTime ScheduledDate { get; set; }
         public string TimeSlot { get; set; }
         public string Status { get; set; }
         public string CancellationReason { get; set; }
     
         public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<HealthRecord> HealthRecords { get; set; }
     }
 }

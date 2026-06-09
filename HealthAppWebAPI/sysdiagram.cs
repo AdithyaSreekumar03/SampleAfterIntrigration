@@ -12,15 +12,12 @@ namespace HealthAppWebAPI
     using System;
     using System.Collections.Generic;
     
-    public partial class HealthRecord
+    public partial class sysdiagram
     {
-        public int HealthRecordId { get; set; }
-        public System.DateTime VisitDate { get; set; }
-        public string Diagnosis { get; set; }
-        public string Prescription { get; set; }
-        public string Notes { get; set; }
-        public int AppointmentId { get; set; }
-    
-        public virtual Appointment Appointment { get; set; }
+        public string name { get; set; }
+        public int principal_id { get; set; }
+        public int diagram_id { get; set; }
+        public Nullable<int> version { get; set; }
+        public byte[] definition { get; set; }
     }
 }

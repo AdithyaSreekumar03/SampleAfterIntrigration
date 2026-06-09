@@ -7,18 +7,20 @@ using HealthAppMVC.Enums;
 
 namespace HealthAppWebAPI.Repositories.Interfaces
 {
+
     public interface IDoctorRepository
     {
         Task<List<Doctor>> GetAllAsync();
 
         Task<Doctor> GetByIdAsync(int id);
 
-        Task<Doctor> AddAsync(Doctor doctor);
+        Task AddAsync(Doctor doctor);
 
         Task UpdateAsync(Doctor doctor);
 
-        Task<bool> ChangeStatusAsync(int id, bool isActive);
+        Task ChangeStatusAsync(int id, bool isActive);
 
-        Task<List<Doctor>> SearchBySpecialisationAsync(SpecialisationType specialisation);
+        Task<List<Doctor>> GetBySpecialisationAsync(
+            SpecialisationType specialisation);
     }
 }

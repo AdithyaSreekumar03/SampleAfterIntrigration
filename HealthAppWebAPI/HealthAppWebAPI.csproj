@@ -180,11 +180,17 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Constants\TimeSlots.cs" />
+    <Compile Include="Controllers\AppointmentController.cs" />
+    <Compile Include="Controllers\DoctorController.cs" />
+    <Compile Include="Controllers\HealthRecordController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Doctor.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Enums\AppointmentStatus.cs" />
     <Compile Include="Enums\GenderType.cs" />
     <Compile Include="Enums\SpecialisationType.cs" />
     <Compile Include="Global.asax.cs">
@@ -211,8 +217,13 @@
     <Compile Include="Models\Appointment.cs" />
     <Compile Include="Models\Doctor.cs" />
     <Compile Include="Models\Dtos\AppointmentDto.cs" />
+    <Compile Include="Models\Dtos\CancelAppointmentDto.cs" />
+    <Compile Include="Models\Dtos\CreateAppointmentDto.cs" />
+    <Compile Include="Models\Dtos\CreateDoctorDto.cs" />
+    <Compile Include="Models\Dtos\CreateHealthRecordDto.cs" />
+    <Compile Include="Models\Dtos\CreatePatientDto.cs" />
     <Compile Include="Models\Dtos\DoctorDto.cs" />
-    <Compile Include="Models\Dtos\HealthRecordsDto.cs" />
+    <Compile Include="Models\Dtos\HealthRecordDto.cs" />
     <Compile Include="Models\Dtos\PatientDto.cs" />
     <Compile Include="Models\HealthRecord.cs" />
     <Compile Include="Patient.cs">
@@ -227,8 +238,17 @@
     <Compile Include="Repositories\Interfaces\IDoctorRepository.cs" />
     <Compile Include="Repositories\Interfaces\IHealthRecordRepository.cs" />
     <Compile Include="Repositories\Interfaces\IPatientRepository.cs" />
+    <Compile Include="Services\Impl\AppointmentService.cs" />
+    <Compile Include="Services\Impl\DoctorService.cs" />
+    <Compile Include="Services\Impl\HealthRecordService.cs" />
     <Compile Include="Services\Impl\PatientService.cs" />
+    <Compile Include="Services\Interfaces\IAppointmentService.cs" />
+    <Compile Include="Services\Interfaces\IDoctorService.cs" />
+    <Compile Include="Services\Interfaces\IHealthRecordService.cs" />
     <Compile Include="Services\Interfaces\IPatientService.cs" />
+    <Compile Include="sysdiagram.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

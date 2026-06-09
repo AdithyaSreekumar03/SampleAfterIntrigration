@@ -13,10 +13,10 @@ namespace HealthAppWebAPI
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class AppDbContext : DbContext
+    public partial class HealthAppDbContext : DbContext
     {
-        public AppDbContext()
-            : base("name=AppDbContext")
+        public HealthAppDbContext()
+            : base("name=HealthAppDbContext")
         {
         }
     
@@ -29,5 +29,6 @@ namespace HealthAppWebAPI
         public virtual DbSet<Doctor> Doctors { get; set; }
         public virtual DbSet<HealthRecord> HealthRecords { get; set; }
         public virtual DbSet<Patient> Patients { get; set; }
+        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
     }
 }

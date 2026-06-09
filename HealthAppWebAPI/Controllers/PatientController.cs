@@ -9,92 +9,71 @@ using System.Web.Http;
 
 namespace HealthAppWebAPI.Controllers
 {
-    public class PatientController : ApiController
+    using System;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+    using System.Net;
+
+    [RoutePrefix("api/patients")]
+    public class PatientsController : ApiController
     {
         private readonly IPatientService _service;
 
-        public PatientController(IPatientService service)
+        public PatientsController(IPatientService service)
         {
             _service = service;
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetAllPatients()
+        [Route("")]
+        public async Task<IHttpActionResult> GetAll()
         {
-            var patients = await _service.GetAllPatients();
-            return Ok(patients);
+            var result = await _service.GetAllPatientsAsync();
+            return Ok(result);
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetPatientById(int id)
+        [Route("{id}")]
+        public async Task<IHttpActionResult> Get(int id)
         {
-            var patient = await _service.GetById(id);
+            var patient = await _service.GetPatientByIdAsync(id);
 
             if (patient == null)
-            {
                 return NotFound();
-            }
 
             return Ok(patient);
         }
 
         [HttpPost]
-        public async Task<IHttpActionResult> AddPatient([FromBody] PatientDto patientDto)
+        [Route("")]
+        public async Task<IHttpActionResult> Create(CreatePatientDto dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest();
+                await _service.RegisterPatientAsync(dto);
+                return StatusCode(HttpStatusCode.Created);
             }
-
-            var result = await _service.AddPatient(patientDto);
-
-            return CreatedAtRoute("DefaultApi", new { id = result.PatientId }, result);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> UpdatePatient(int id, [FromBody] PatientDto patientDto)
+        [Route("{id}")]
+        public async Task<IHttpActionResult> Update(
+            int id,
+            CreatePatientDto dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest();
+                await _service.UpdatePatientAsync(id, dto);
+                return Ok("Patient updated successfully");
             }
-
-            var result = await _service.UpdatePatient(id, patientDto);
-
-            if (result == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return Ok(result);
-        }
-        [HttpDelete]
-        public async Task<IHttpActionResult> DeletePatient(int id)
-        {
-            var isDeleted = await _service.DeletePatient(id);
-
-            if (!isDeleted)
-            {
-                return NotFound();
-            }
-
-            return Ok("Patient deleted successfully");
-        }
-
-        [HttpGet]
-        [Route("api/patient/email-exists")]
-        public async Task<IHttpActionResult> EmailExists(string email)
-        {
-            var exists = await _service.EmailExists(email);
-            return Ok(exists);
-        }
-
-        [HttpGet]
-        [Route("api/patient/appointment-count/{patientId}")]
-        public async Task<IHttpActionResult> GetAppointmentCount(int patientId)
-        {
-            var count = await _service.GetAppointmentCount(patientId);
-            return Ok(count);
         }
     }
 }

@@ -1,63 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HealthAppWebAPI.Repositories.Interfaces;
+using System.Data.Entity;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace HealthAppWebAPI.Repositories.Impl
 {
-    using HealthAppWebAPI.Repositories.Interfaces;
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     public class HealthRecordRepository : IHealthRecordRepository
     {
-        private readonly AppDbContext _context;
+        private readonly HealthAppDbContext _context;
 
-        public HealthRecordRepository(AppDbContext context)
+        public HealthRecordRepository(HealthAppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<HealthRecord> AddAsync(HealthRecord record)
-        {
-            _context.HealthRecords.Add(record);
-            await _context.SaveChangesAsync();
-            return record;
-        }
-
         public async Task<List<HealthRecord>> GetAllAsync()
         {
-            return await _context.HealthRecords.ToListAsync();
+            return await _context.HealthRecords
+                .Include(h => h.Appointment.Patient)
+                .Include(h => h.Appointment.Doctor)
+                .ToListAsync();
         }
 
         public async Task<HealthRecord> GetByIdAsync(int id)
         {
             return await _context.HealthRecords
-                .FirstOrDefaultAsync(r => r.RecordId == id);
+                .Include(h => h.Appointment.Patient)
+                .Include(h => h.Appointment.Doctor)
+                .FirstOrDefaultAsync(h => h.HealthRecordId == id);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<HealthRecord> GetByAppointmentIdAsync(int appointmentId)
         {
-            var record = await _context.HealthRecords.FindAsync(id);
-
-            if (record == null)
-                return false;
-
-            _context.HealthRecords.Remove(record);
-            await _context.SaveChangesAsync();
-
-            return true;
+            return await _context.HealthRecords
+                .FirstOrDefaultAsync(h => h.AppointmentId == appointmentId);
         }
 
-        public async Task UpdateAsync(HealthRecord record)
+        public async Task AddAsync(HealthRecord record)
         {
-            if (record == null)
-                throw new ArgumentNullException(nameof(record));
-
-            _context.Entry(record).State = EntityState.Modified;
+            _context.HealthRecords.Add(record);
             await _context.SaveChangesAsync();
         }
     }

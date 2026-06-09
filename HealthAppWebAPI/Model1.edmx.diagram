@@ -4,15 +4,15 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="de1beacc119c441998e428a5ff4cab4c" Name="Diagram1">
-        <EntityTypeShape EntityType="HMSDataModel.Appointment" Width="1.5" PointX="3" PointY="4.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="HMSDataModel.Doctor" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="HMSDataModel.HealthRecord" Width="1.5" PointX="6" PointY="4.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="HMSDataModel.Patient" Width="1.5" PointX="0.75" PointY="4.5" IsExpanded="true" />
-        <AssociationConnector Association="HMSDataModel.FK_Appointments_Doctors" ManuallyRouted="false" />
-        <AssociationConnector Association="HMSDataModel.FK_Appointments_Patients" ManuallyRouted="false" />
-        <AssociationConnector Association="HMSDataModel.FK_HealthRecords_Doctors" ManuallyRouted="false" />
-        <AssociationConnector Association="HMSDataModel.FK_HealthRecords_Patients" ManuallyRouted="false" />
+      <Diagram DiagramId="2efa0efb610d4527a5ced6bf9a2d2ad0" Name="Diagram1">
+        <EntityTypeShape EntityType="HospitalManagementSystemModel.Appointment" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="HospitalManagementSystemModel.Doctor" Width="1.5" PointX="0.75" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="HospitalManagementSystemModel.HealthRecord" Width="1.5" PointX="5.25" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HospitalManagementSystemModel.Patient" Width="1.5" PointX="0.75" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="HospitalManagementSystemModel.sysdiagram" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
+        <AssociationConnector Association="HospitalManagementSystemModel.FK_Appointments_Doctors" ManuallyRouted="false" />
+        <AssociationConnector Association="HospitalManagementSystemModel.FK_Appointments_Patients" ManuallyRouted="false" />
+        <AssociationConnector Association="HospitalManagementSystemModel.FK_HealthRecords_Appointments" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
