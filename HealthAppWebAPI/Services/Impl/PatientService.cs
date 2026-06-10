@@ -7,15 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using HealthAppMVC.Enums;
 
 namespace HealthAppWebAPI.Services.Impl
 {
-
-    using AutoMapper;
-    using HealthAppMVC.Enums;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     public class PatientService : IPatientService
     {

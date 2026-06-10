@@ -1,31 +1,27 @@
-using HealthAppMVC.Repository.Implementation;
-using HealthAppMVC.Repository.Interface;
+
 using HealthAppMVC.Services.Implementation;
 using HealthAppMVC.Services.Interface;
 using System;
+using System.Net.Http;
+using System.Web.Mvc;
 using Unity;
+using Unity.Mvc5;
 
 namespace HealthAppMVC
 {
+
+
     /// <summary>
     /// Specifies the Unity configuration for the main container.
     /// </summary>
     public static class UnityConfig
     {
-        #region Unity Container
-        private static Lazy<IUnityContainer> container =
-          new Lazy<IUnityContainer>(() =>
-          {
-              var container = new UnityContainer();
-              RegisterTypes(container);
-              return container;
-          });
+        
 
         /// <summary>
         /// Configured Unity Container.
         /// </summary>
-        public static IUnityContainer Container => container.Value;
-        #endregion
+        
 
         /// <summary>
         /// Registers the type mappings with the Unity container.
@@ -37,26 +33,21 @@ namespace HealthAppMVC
         /// allows resolving a concrete type even if it was not previously
         /// registered.
         /// </remarks>
-        public static void RegisterTypes(IUnityContainer container)
+        public static void RegisterComponents()
         {
-            container.RegisterType
-                <IPatientRepository, PatientRepository>();
+            var container = new UnityContainer();
 
-
-            container.RegisterType
-               <IPatientService, PatientService>();
-
-            container.RegisterType
-                <IDoctorRepository,DoctorRepository>();
-
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:44301/api/")
+            };
+            container.RegisterInstance<HttpClient>(httpClient);
+            container.RegisterType <IPatientService, PatientService>();
             container.RegisterType<IDoctorService, DoctorService>();
-
-            container.RegisterType<IAppointmentRepository,AppointmentRepository>();
-
             container.RegisterType<IAppointmentService,AppointmentService>();
-
-            container.RegisterType<IHealthRecordRepository,HealthRecordRepository>();
             container.RegisterType <IHealthRecordService,HealthRecordService>();
+
+            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
     }
 }

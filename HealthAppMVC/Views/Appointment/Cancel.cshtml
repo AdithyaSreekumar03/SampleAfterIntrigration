@@ -1,4 +1,4 @@
-﻿@model HealthAppMVC.Models.Appointment
+﻿@model HealthAppWebAPI.Models.Dtos.AppointmentDto
 
 @{
     ViewBag.Title = "Cancel Appointment";
@@ -21,7 +21,7 @@
 
         <p>
             <strong>Date:</strong>
-            @Model.ScheduledDate.ToShortDateString()
+            @DateTime.Parse(Model.ScheduledDate).ToShortDateString()
         </p>
 
         @using (Html.BeginForm())
@@ -47,11 +47,7 @@
                 "Back",
                 "Index",
                 null,
-                new
-                {
-                    @class =
-                    "btn btn-secondary"
-                })
+                new { @class = "btn btn-secondary" })
         }
     </div>
 </div>

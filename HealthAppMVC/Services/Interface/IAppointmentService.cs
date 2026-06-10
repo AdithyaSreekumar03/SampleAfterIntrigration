@@ -4,33 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HealthAppWebAPI.Models.Dtos;
+
 
 namespace HealthAppMVC.Services.Interface
 {
     public interface IAppointmentService
     {
-        IEnumerable<Appointment> GetAllAppointments();
+        Task<IEnumerable<AppointmentDto>> GetAllAppointmentsAsync();
+        Task<AppointmentDto> GetAppointmentByIdAsync(int id);
+        Task BookAppointmentAsync(CreateAppointmentDto dto);
+        Task ConfirmAppointmentAsync(int appointmentId);
+        Task CancelAppointmentAsync(int appointmentId, string reason);
 
-        Appointment GetAppointmentById(int id);
+        Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientAsync(int patientId);
+        Task<IEnumerable<AppointmentDto>> GetAppointmentsByDoctorAsync(int doctorId);
 
-        void BookAppointment(
-            Appointment appointment);
+        Task<IEnumerable<AppointmentDto>> GetUpcomingAppointmentsAsync();
+        Task<IEnumerable<AppointmentDto>> GetUpcomingAppointmentsByDoctorAsync(int doctorId);
 
-        void ConfirmAppointment(
-            int appointmentId);
+        Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime scheduledDate);
 
-        void CancelAppointment(
-            int appointmentId,
-            string reason);
+        Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientNameAsync(string patientName);
 
-        
-
-        IEnumerable<Appointment>
-            GetAppointmentsByPatient(
-            int patientId);
-
-        IEnumerable<Appointment>
-            GetAppointmentsByDoctor(
-            int doctorId);
+        Task<bool> HealthRecordExistsAsync(int appointmentId);
     }
 }

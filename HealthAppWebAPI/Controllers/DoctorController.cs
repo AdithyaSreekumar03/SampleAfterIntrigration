@@ -100,5 +100,19 @@ namespace HealthAppWebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("search")]
+        public async Task<IHttpActionResult> SearchByName(string name)
+        {
+            var allDoctors = await _service.GetAllDoctorsAsync();
+
+            var result = allDoctors
+                .Where(d => d.FullName.ToLower().Contains(name.ToLower()))
+                .ToList();
+
+            return Ok(result);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HealthAppMVC.Models;
+using HealthAppWebAPI.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,16 +10,13 @@ namespace HealthAppMVC.Services.Interface
 {
     public interface IPatientService
     {
-        IEnumerable<Patient> GetAllPatients();
+        Task<IEnumerable<PatientDto>> GetAllPatientsAsync();
+        Task<PatientDto> GetPatientByIdAsync(int id);
+        Task RegisterPatientAsync(CreatePatientDto dto);
+        Task UpdatePatientAsync(int id, CreatePatientDto dto);
 
-        Patient GetPatientById(int id);
-
-        void RegisterPatient(Patient patient);
-
-        void UpdatePatient(Patient patient);
-
-    
-
-        int GetAppointmentCount(int patientId);
+        Task<IEnumerable<PatientDto>> SearchByNameAsync(string name);
+        Task<int> GetAppointmentCountAsync(int patientId);
     }
+
 }

@@ -1,4 +1,4 @@
-﻿@model HealthAppMVC.Models.Appointment
+﻿@model HealthAppWebAPI.Models.Dtos.CreateAppointmentDto
 
 @{
     ViewBag.Title = "Book Appointment";
@@ -55,31 +55,11 @@
             m => m.TimeSlot,
             new List<SelectListItem>
             {
-                new SelectListItem
-                {
-                    Text="09:00 AM",
-                    Value="09:00 AM"
-                },
-                new SelectListItem
-                {
-                    Text="10:00 AM",
-                    Value="10:00 AM"
-                },
-                new SelectListItem
-                {
-                    Text="11:00 AM",
-                    Value="11:00 AM"
-                },
-                new SelectListItem
-                {
-                    Text="02:00 PM",
-                    Value="02:00 PM"
-                },
-                new SelectListItem
-                {
-                    Text="03:00 PM",
-                    Value="03:00 PM"
-                }
+                new SelectListItem { Text="09:00 AM", Value="09:00 AM" },
+                new SelectListItem { Text="10:00 AM", Value="10:00 AM" },
+                new SelectListItem { Text="11:00 AM", Value="11:00 AM" },
+                new SelectListItem { Text="02:00 PM", Value="02:00 PM" },
+                new SelectListItem { Text="03:00 PM", Value="03:00 PM" }
             },
             "-- Select Slot --",
             new { @class = "form-control" })

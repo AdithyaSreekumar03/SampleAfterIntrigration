@@ -6,14 +6,11 @@ using HealthAppWebAPI.Models.Dtos;
 using HealthAppWebAPI.Services.Interfaces;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Net;
+
 
 namespace HealthAppWebAPI.Controllers
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Web.Http;
-    using System.Net;
-
     [RoutePrefix("api/patients")]
     public class PatientsController : ApiController
     {
@@ -75,5 +72,20 @@ namespace HealthAppWebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("search")]
+        public async Task<IHttpActionResult> SearchByName(string name)
+        {
+            var all = await _service.GetAllPatientsAsync();
+
+            var result = all
+                .Where(p => p.FullName.ToLower()
+                .Contains(name.ToLower()))
+                .ToList();
+
+            return Ok(result);
+        }
+
     }
 }

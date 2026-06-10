@@ -1,23 +1,21 @@
 ﻿using HealthAppMVC.Models;
 using System.Collections.Generic;
+using HealthAppWebAPI.Models.Dtos;
+using System.Threading.Tasks;
 
 namespace HealthAppMVC.Services.Interface
 {
+
+
     public interface IDoctorService
     {
-        IEnumerable<Doctor> GetAllDoctors();
+        Task<IEnumerable<DoctorDto>> GetAllDoctorsAsync();
+        Task<DoctorDto> GetDoctorByIdAsync(int id);
+        Task AddDoctorAsync(CreateDoctorDto dto);
+        Task UpdateDoctorAsync(int id, CreateDoctorDto dto);
+        Task ChangeDoctorStatusAsync(int doctorId, bool isActive);
+        Task<IEnumerable<DoctorDto>> SearchBySpecialisationAsync(string specialisation);
+        Task<IEnumerable<DoctorDto>> SearchByNameAsync(string name);
 
-        Doctor GetDoctorById(int id);
-
-        void AddDoctor(Doctor doctor);
-
-        void UpdateDoctor(Doctor doctor);
-
-        void ChangeDoctorStatus(
-            int doctorId,
-            bool isActive);
-
-        IEnumerable<Doctor> SearchBySpecialisation(
-            SpecialisationType specialisation);
     }
 }

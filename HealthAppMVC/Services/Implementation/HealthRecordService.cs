@@ -1,100 +1,63 @@
 ﻿using HealthAppMVC.Models;
-using HealthAppMVC.Repository.Interface;
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace HealthAppMVC.Services.Implementation
 {
-    public class HealthRecordService
-        : IHealthRecordService
+    public class HealthRecordService : IHealthRecordService
     {
-        private readonly IHealthRecordRepository
-            _healthRecordRepository;
-        
+        private readonly HttpClient _httpClient;
 
-        private readonly IAppointmentRepository
-            _appointmentRepository;
-
-        public HealthRecordService(
-            IHealthRecordRepository
-                healthRecordRepository,
-
-            IAppointmentRepository
-                appointmentRepository)
+        public HealthRecordService(HttpClient httpClient)
         {
-            _healthRecordRepository =
-                healthRecordRepository;
-
-            _appointmentRepository =
-                appointmentRepository;
+            _httpClient = httpClient;
         }
 
-        public List<HealthRecord>
-            GetPatientHistory(
-                int patientId)
+        public async Task<IEnumerable<HealthRecordDto>> GetAllAsync()
         {
-            return _healthRecordRepository
-                .GetByPatientId(patientId);
+            var response = await _httpClient.GetAsync("healthrecords");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<HealthRecordDto>>(data);
         }
 
-        public HealthRecord GetRecordById(
-            int recordId)
+
+        public async Task<int> GetPatientIdByAppointmentAsync(int appointmentId)
         {
-            return _healthRecordRepository
-                .GetById(recordId);
+            var response = await _httpClient.GetAsync($"Appointment/{appointmentId}");
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadAsStringAsync();
+            AppointmentDto appointment=JsonConvert.DeserializeObject<AppointmentDto>(result);
+            return appointment.PatientId;
         }
 
-        public HealthRecord AddHealthRecord(
-            HealthRecord record)
+        public async Task<HealthRecordDto> GetByIdAsync(int id)
         {
-            var appointment =
-                _appointmentRepository
-                .GetById(
-                    record.AppointmentId);
+            var response = await _httpClient.GetAsync($"healthrecords/{id}");
 
-            if (appointment == null)
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Health record not found.");
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<HealthRecordDto>(data);
+        }
+
+        public async Task AddHealthRecordAsync(CreateHealthRecordDto dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("healthrecords", dto);
+
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Appointment not found.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            if (appointment.Status !=
-                AppointmentStatus.Confirmed)
-            {
-                throw new Exception(
-                    "Health record can only be added for completed appointments.");
-            }
-
-            bool exists =
-                _appointmentRepository
-                .HealthRecordExists(
-                    record.AppointmentId);
-
-            if (exists)
-            {
-                throw new Exception(
-                    "Health record already exists for this appointment.");
-            }
-
-            record.PatientId =
-                appointment.PatientId;
-
-            record.DoctorId =
-                appointment.DoctorId;
-
-            record.VisitDate =
-                DateTime.Now;
-
-            _healthRecordRepository
-                .Add(record);
-
-            _appointmentRepository.UpdateStatus(
-    record.AppointmentId,
-    AppointmentStatus.Completed,
-    null);
-
-            return record;
         }
     }
+
 }

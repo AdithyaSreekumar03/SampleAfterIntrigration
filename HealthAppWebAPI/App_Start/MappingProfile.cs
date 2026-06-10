@@ -33,7 +33,10 @@ namespace HealthAppWebAPI.App_Start
                 .ForMember(dest => dest.PatientName,
                     opt => opt.MapFrom(src => src.Appointment.Patient.FullName))
                 .ForMember(dest => dest.DoctorName,
-                    opt => opt.MapFrom(src => src.Appointment.Doctor.FullName));
+                    opt => opt.MapFrom(src => src.Appointment.Doctor.FullName))
+                .ForMember(dest => dest.PatientId,
+                    opt => opt.MapFrom(src => src.Appointment.PatientId));
+
 
             CreateMap<Patient, PatientDto>()
                 .ForMember(dest => dest.Gender,

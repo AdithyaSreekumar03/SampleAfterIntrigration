@@ -1,111 +1,95 @@
-﻿using HealthAppMVC.Models;
-using HealthAppMVC.Repository.Interface;
+﻿
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
-namespace HealthAppMVC.Services.Implementation
+public class DoctorService : IDoctorService
 {
-    public class DoctorService : IDoctorService
+    private readonly HttpClient _httpClient;
+
+    public DoctorService(HttpClient httpClient)
     {
-        private readonly IDoctorRepository _doctorRepository;
+        _httpClient = httpClient;
+    }
 
-        public DoctorService(
-            IDoctorRepository doctorRepository)
+    public async Task<IEnumerable<DoctorDto>> GetAllDoctorsAsync()
+    {
+        var response = await _httpClient.GetAsync("doctors");
+        response.EnsureSuccessStatusCode();
+
+        var data = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<DoctorDto>>(data);
+    }
+
+    public async Task<DoctorDto> GetDoctorByIdAsync(int id)
+    {
+        var response = await _httpClient.GetAsync($"doctors/{id}");
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"Doctor with Id {id} not found.");
+
+        var data = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<DoctorDto>(data);
+    }
+
+    public async Task AddDoctorAsync(CreateDoctorDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("doctors", dto);
+
+        if (!response.IsSuccessStatusCode)
         {
-            _doctorRepository = doctorRepository;
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
         }
+    }
 
-        public IEnumerable<Doctor> GetAllDoctors()
+    public async Task UpdateDoctorAsync(int id, CreateDoctorDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync(
+            $"doctors/{id}", dto);
+
+        if (!response.IsSuccessStatusCode)
         {
-            return _doctorRepository.GetAll();
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
         }
+    }
 
-        public Doctor GetDoctorById(int id)
+    public async Task ChangeDoctorStatusAsync(int doctorId, bool isActive)
+    {
+        var response = await _httpClient.PostAsync(
+            $"doctors/{doctorId}/status?isActive={isActive}", null);
+
+        if (!response.IsSuccessStatusCode)
         {
-            Doctor doctor =
-                _doctorRepository.GetById(id);
-
-            if (doctor == null)
-            {
-                throw new Exception(
-                    $"Doctor with Id {id} not found.");
-            }
-
-            return doctor;
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
         }
+    }
 
-        public void AddDoctor(Doctor doctor)
-        {
-            if (doctor.ConsultationFee <= 0)
-            {
-                throw new Exception(
-                    "Consultation fee must be greater than zero.");
-            }
+    public async Task<IEnumerable<DoctorDto>> SearchBySpecialisationAsync(string specialisation)
+    {
+        var response = await _httpClient.GetAsync(
+            $"doctors/specialisation/{specialisation}");
 
-            if (doctor.YearsOfExperience < 0)
-            {
-                throw new Exception(
-                    "Years of experience cannot be negative.");
-            }
+        response.EnsureSuccessStatusCode();
 
-            doctor.IsActive = true;
+        var data = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<DoctorDto>>(data);
+    }
 
-            _doctorRepository.Add(doctor);
-        }
+    public async Task<IEnumerable<DoctorDto>> SearchByNameAsync(string name)
+    {
+        var response = await _httpClient.GetAsync(
+            $"doctors/search?name={name}");
 
-        public void UpdateDoctor(Doctor doctor)
-        {
-            Doctor existingDoctor =
-                _doctorRepository.GetById(
-                    doctor.DoctorId);
+        response.EnsureSuccessStatusCode();
 
-            if (existingDoctor == null)
-            {
-                throw new Exception(
-                    "Doctor not found.");
-            }
-
-            if (doctor.ConsultationFee <= 0)
-            {
-                throw new Exception(
-                    "Consultation fee must be greater than zero.");
-            }
-
-            if (doctor.YearsOfExperience < 0)
-            {
-                throw new Exception(
-                    "Years of experience cannot be negative.");
-            }
-
-            _doctorRepository.Update(doctor);
-        }
-
-        public void ChangeDoctorStatus(
-            int doctorId,
-            bool isActive)
-        {
-            Doctor doctor =
-                _doctorRepository.GetById(
-                    doctorId);
-
-            if (doctor == null)
-            {
-                throw new Exception(
-                    "Doctor not found.");
-            }
-
-            _doctorRepository.ChangeStatus(
-                doctorId,
-                isActive);
-        }
-
-        public IEnumerable<Doctor> SearchBySpecialisation(
-            SpecialisationType specialisation)
-        {
-            return _doctorRepository
-                .SearchBySpecialisation(
-                    specialisation);
-        }
+        var data = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<DoctorDto>>(data);
     }
 }

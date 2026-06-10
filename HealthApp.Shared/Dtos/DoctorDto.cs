@@ -12,6 +12,7 @@ namespace HealthAppWebAPI.Models.Dtos
         public string FullName { get; set; }
 
         public string Specialisation { get; set; }
+        public int YearsOfExperience { get; set; }
 
         public decimal ConsultationFee { get; set; }
 

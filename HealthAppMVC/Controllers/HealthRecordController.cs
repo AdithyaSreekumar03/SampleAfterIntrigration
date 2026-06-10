@@ -1,106 +1,106 @@
 ﻿using HealthAppMVC.Models;
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace HealthAppMVC.Controllers
 {
-    public class HealthRecordController
-        : Controller
+
+    public class HealthRecordController : Controller
     {
-        private readonly IHealthRecordService
-            _healthRecordService;
+        private readonly IHealthRecordService _healthRecordService;
+        private readonly IPatientService _patientService;
 
         public HealthRecordController(
-            IHealthRecordService
-                healthRecordService)
+            IHealthRecordService healthRecordService,
+            IPatientService patientService)
         {
-            _healthRecordService =
-                healthRecordService;
+            _healthRecordService = healthRecordService;
+            _patientService = patientService;
         }
 
-        // GET:
-        // HealthRecord/Create?appointmentId=1
-        public ActionResult Create(
-            int appointmentId)
+        public ActionResult Create(int appointmentId)
         {
-            HealthRecord model =
-                new HealthRecord
-                {
-                    AppointmentId =
-                        appointmentId
-                };
+            var model = new CreateHealthRecordDto
+            {
+                AppointmentId = appointmentId
+            };
 
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(
-            HealthRecord record)
+        public async Task<ActionResult> Create(CreateHealthRecordDto dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(record);
+                    return View(dto);
                 }
 
-               record =  _healthRecordService
-                    .AddHealthRecord(
-                        record);
+                await _healthRecordService.AddHealthRecordAsync(dto);
 
-                TempData["Success"] =
-                    "Health Record Added Successfully";
+                TempData["Success"] = "Health Record Added Successfully";
 
-                return RedirectToAction(
-                    "History",
-                    new
-                    {
-                        patientId =
-                        record.PatientId
-                    });
+                return RedirectToAction("SearchPatientHistory");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    "",
-                    ex.Message);
-
-                return View(record);
+                ModelState.AddModelError("", ex.Message);
+                return View(dto);
             }
         }
 
-        // HealthRecord/History/1
-        public ActionResult History(
-            int patientId)
+        public async Task<ActionResult> Details(int id)
         {
-            var records =
-                _healthRecordService
-                .GetPatientHistory(
-                    patientId);
+            try
+            {
+                var record =
+                    await _healthRecordService.GetByIdAsync(id);
 
-            ViewBag.PatientId =
-                patientId;
+                return View(record);
+            }
+            catch
+            {
+                return HttpNotFound();
+            }
+        }
+
+        public async Task<ActionResult> SearchPatientHistory(int? patientId)
+        {
+            IEnumerable<HealthRecordDto> records =
+                Enumerable.Empty<HealthRecordDto>();
+
+            if (patientId.HasValue)
+            {
+                var all = await _healthRecordService.GetAllAsync();
+
+                records = all
+                    .Where(r => r.PatientName != null); 
+            }
 
             return View(records);
         }
 
-        // HealthRecord/Details/1
-        public ActionResult Details(
-            int id)
+        public async Task<JsonResult> SearchPatientNames(string term)
         {
-            var record =
-                _healthRecordService
-                .GetRecordById(id);
+            var patients =
+                await _patientService.SearchByNameAsync(term);
 
-            if (record == null)
+            var result = patients.Select(p => new
             {
-                return HttpNotFound();
-            }
+                label = p.FullName,
+                value = p.PatientId
+            });
 
-            return View(record);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
+
 }

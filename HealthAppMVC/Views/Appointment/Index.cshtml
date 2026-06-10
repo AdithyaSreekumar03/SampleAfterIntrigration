@@ -1,5 +1,4 @@
-﻿@using HealthAppMVC.Models
-@model IEnumerable<HealthAppMVC.Models.Appointment>
+﻿@model IEnumerable<HealthAppWebAPI.Models.Dtos.AppointmentDto>
 
 @{
     ViewBag.Title = "Appointments";
@@ -47,62 +46,41 @@
             <tr>
                 <td>@item.PatientName</td>
                 <td>@item.DoctorName</td>
-                <td>@item.ScheduledDate.ToShortDateString()</td>
+                <td>@DateTime.Parse(item.ScheduledDate).ToShortDateString()</td>
                 <td>@item.TimeSlot</td>
                 <td>@item.Status</td>
 
                 <td>
-                    @if (item.Status ==
-                         HealthAppMVC.Models.AppointmentStatus.Pending)
+
+                    @if (item.Status == "Pending")
                     {
                         @Html.ActionLink(
                             "Confirm",
                             "Confirm",
                             new { id = item.AppointmentId },
-                            new
-                            {
-                                @class =
-                                "btn btn-success btn-sm me-1"
-                            })
-
+                            new { @class = "btn btn-success btn-sm me-1" })
                     }
 
-
-
-                    @if (item.Status != AppointmentStatus.Completed &&
-     item.Status != AppointmentStatus.Cancelled)
+                    @if (item.Status != "Completed" &&
+                         item.Status != "Cancelled")
                     {
                         @Html.ActionLink(
                             "Cancel",
-                            "UpdateStatus",
-                            new
-                            {
-                                id = item.AppointmentId,
-                                status = AppointmentStatus.Cancelled
-                            },
+                            "Cancel",
+                            new { id = item.AppointmentId },
                             new { @class = "btn btn-danger btn-sm" })
                     }
 
-
-
-
-                    @if (item.Status == AppointmentStatus.Confirmed)
+                    @if (item.Status == "Confirmed")
                     {
                         @Html.ActionLink(
                             "Add Health Record",
                             "Create",
                             "HealthRecord",
-                            new
-                            {
-                                appointmentId =
-                                item.AppointmentId
-                            },
-                            new
-                            {
-                                @class =
-                                "btn btn-success btn-sm"
-                            })
+                            new { appointmentId = item.AppointmentId },
+                            new { @class = "btn btn-success btn-sm" })
                     }
+
                 </td>
             </tr>
         }

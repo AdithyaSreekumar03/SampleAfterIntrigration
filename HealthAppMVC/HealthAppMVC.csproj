@@ -214,6 +214,9 @@
     <Reference Include="Unity.Mvc, Version=5.11.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.Mvc.5.11.1\lib\net47\Unity.Mvc.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Mvc5, Version=1.4.0.0, Culture=neutral, PublicKeyToken=43da31bc42a85347, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Mvc5.1.4.0\lib\net45\Unity.Mvc5.dll</HintPath>
+    </Reference>
     <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
       <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
     </Reference>
@@ -240,32 +243,19 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
-    <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Constants\TimeSlots.cs" />
     <Compile Include="Controllers\AppointmentController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HealthRecordController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
-    <Compile Include="Database\InMemoryDatabase.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Appointment.cs" />
     <Compile Include="Models\AppointmentStatus.cs" />
-    <Compile Include="Models\Doctor.cs" />
     <Compile Include="Models\GenderType.cs" />
-    <Compile Include="Models\HealthRecord.cs" />
-    <Compile Include="Models\Patient.cs" />
+    <Compile Include="Models\SpecialisationType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\Implementation\AppointmentRepository.cs" />
-    <Compile Include="Repository\Implementation\DoctorRepository.cs" />
-    <Compile Include="Repository\Implementation\HealthRecordRepository.cs" />
-    <Compile Include="Repository\Implementation\PatientRepository.cs" />
-    <Compile Include="Repository\Interface\IAppointmentRepository.cs" />
-    <Compile Include="Repository\Interface\IDoctorRepository.cs" />
-    <Compile Include="Repository\Interface\IHealthRecordRepository.cs" />
-    <Compile Include="Repository\Interface\IPatientRepository.cs" />
     <Compile Include="Services\Implementation\AppointmentService.cs" />
     <Compile Include="Services\Implementation\DoctorService.cs" />
     <Compile Include="Services\Implementation\HealthRecordService.cs" />
@@ -273,7 +263,7 @@
     <Compile Include="Services\Interface\IAppointmentService.cs" />
     <Compile Include="Services\Interface\IDoctorService.cs" />
     <Compile Include="Services\Interface\IHealthRecordService.cs" />
-    <Compile Include="Services\Interface\IpatientService.cs" />
+    <Compile Include="Services\Interface\IPatientService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -347,25 +337,66 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Patient\Index.cshtml" />
-    <Content Include="Views\Patient\Create.cshtml" />
-    <Content Include="Views\Patient\Edit.cshtml" />
-    <Content Include="Views\Patient\Details.cshtml" />
-    <Content Include="Views\Patient\Delete.cshtml" />
-    <Content Include="Views\Doctor\Index.cshtml" />
-    <Content Include="Views\Doctor\Create.cshtml" />
-    <Content Include="Views\Doctor\Edit.cshtml" />
-    <Content Include="Views\Doctor\Details.cshtml" />
     <Content Include="Views\Appointment\Index.cshtml" />
     <Content Include="Views\Appointment\Create.cshtml" />
     <Content Include="Views\Appointment\Cancel.cshtml" />
+    <Content Include="Views\Appointment\UpcomingAppointments.cshtml" />
+    <Content Include="Views\Appointment\BookAppointment.cshtml" />
+    <Content Include="Views\Appointment\ViewAppointments.cshtml" />
     <Content Include="Views\Appointment\Delete.cshtml" />
+    <Content Include="Views\Doctor\Create.cshtml" />
+    <Content Include="Views\Doctor\Details.cshtml" />
+    <Content Include="Views\Doctor\DoctorSearch.cshtml" />
+    <Content Include="Views\Doctor\Edit.cshtml" />
+    <Content Include="Views\Doctor\Index.cshtml" />
+    <Content Include="Views\Doctor\SearchDoctor.cshtml" />
     <Content Include="Views\HealthRecord\Create.cshtml" />
-    <Content Include="Views\HealthRecord\History.cshtml" />
     <Content Include="Views\HealthRecord\Details.cshtml" />
+    <Content Include="Views\HealthRecord\SearchPatientHistory.cshtml" />
+    <Content Include="Views\views\Appointment\BookAppointment.cshtml" />
+    <Content Include="Views\views\Appointment\Cancel.cshtml" />
+    <Content Include="Views\views\Appointment\Create.cshtml" />
+    <Content Include="Views\views\Appointment\Delete.cshtml" />
+    <Content Include="Views\views\Appointment\Index.cshtml" />
+    <Content Include="Views\views\Appointment\UpcomingAppointments.cshtml" />
+    <Content Include="Views\views\Appointment\ViewAppointments.cshtml" />
+    <Content Include="Views\views\Doctor\Create.cshtml" />
+    <Content Include="Views\views\Doctor\Details.cshtml" />
+    <Content Include="Views\views\Doctor\DoctorSearch.cshtml" />
+    <Content Include="Views\views\Doctor\Edit.cshtml" />
+    <Content Include="Views\views\Doctor\Index.cshtml" />
+    <Content Include="Views\views\Doctor\SearchDoctor.cshtml" />
+    <Content Include="Views\views\HealthRecord\Create.cshtml" />
+    <Content Include="Views\views\HealthRecord\Details.cshtml" />
+    <Content Include="Views\views\HealthRecord\SearchPatientHistory.cshtml" />
+    <Content Include="Views\views\Home\About.cshtml" />
+    <Content Include="Views\views\Home\Contact.cshtml" />
+    <Content Include="Views\views\Home\DoctorServices.cshtml" />
+    <Content Include="Views\views\Home\Index.cshtml" />
+    <Content Include="Views\views\Home\PatientServices.cshtml" />
+    <Content Include="Views\views\Patient\Create.cshtml" />
+    <Content Include="Views\views\Patient\Delete.cshtml" />
+    <Content Include="Views\views\Patient\Details.cshtml" />
+    <Content Include="Views\views\Patient\Edit.cshtml" />
+    <Content Include="Views\views\Patient\Index.cshtml" />
+    <Content Include="Views\views\Patient\PatientSearch.cshtml" />
+    <Content Include="Views\views\Patient\SearchPatient.cshtml" />
+    <Content Include="Views\views\Shared\Error.cshtml" />
+    <Content Include="Views\views\Shared\_Layout.cshtml" />
+    <Content Include="Views\views\Web.config" />
+    <Content Include="Views\views\_ViewStart.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\DoctorServices.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\PatientServices.cshtml" />
+    <Content Include="Views\Patient\Create.cshtml" />
+    <Content Include="Views\Patient\Delete.cshtml" />
+    <Content Include="Views\Patient\Details.cshtml" />
+    <Content Include="Views\Patient\Edit.cshtml" />
+    <Content Include="Views\Patient\Index.cshtml" />
+    <Content Include="Views\Patient\PatientSearch.cshtml" />
+    <Content Include="Views\Patient\SearchPatient.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

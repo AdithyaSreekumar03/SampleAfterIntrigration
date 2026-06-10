@@ -1,87 +1,90 @@
 ﻿using HealthAppMVC.Models;
-using HealthAppMVC.Repository.Interface;
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace HealthAppMVC.Services.Implementation
 {
+
     public class PatientService : IPatientService
     {
-        private readonly IPatientRepository _patientRepository;
+        private readonly HttpClient _httpClient;
 
-        public PatientService(
-            IPatientRepository patientRepository)
+        public PatientService(HttpClient httpClient)
         {
-            _patientRepository = patientRepository;
+            _httpClient = httpClient;
         }
 
-        public IEnumerable<Patient> GetAllPatients()
+        public async Task<IEnumerable<PatientDto>> GetAllPatientsAsync()
         {
-            return _patientRepository.GetAll();
+            var response = await _httpClient.GetAsync("patients");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<PatientDto>>(data);
         }
 
-        public Patient GetPatientById(int id)
+        public async Task<PatientDto> GetPatientByIdAsync(int id)
         {
-            var patient =
-                _patientRepository.GetById(id);
+            var response = await _httpClient.GetAsync($"patients/{id}");
 
-            if (patient == null)
-            {
-                throw new Exception(
-                    $"Patient with Id {id} not found.");
-            }
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Patient with Id {id} not found.");
 
-            return patient;
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<PatientDto>(data);
         }
 
-        public void RegisterPatient(Patient patient)
+        public async Task RegisterPatientAsync(CreatePatientDto dto)
         {
-            if (_patientRepository.EmailExists(patient.Email))
+            var response = await _httpClient.PostAsJsonAsync("patients", dto);
+
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Email already exists.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            if (patient.DateOfBirth > DateTime.Today)
-            {
-                throw new Exception("Date of Birth cannot be a future date.");
-            }
-
-            patient.CreatedDate = DateTime.Now;
-
-            _patientRepository.Add(patient);
         }
 
-        public void UpdatePatient(Patient patient)
+        public async Task UpdatePatientAsync(int id, CreatePatientDto dto)
         {
-            var existingPatient =
-                _patientRepository.GetById(
-                    patient.PatientId);
+            var response = await _httpClient.PutAsJsonAsync(
+                $"patients/{id}", dto);
 
-            if (existingPatient == null)
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Patient not found.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            if (patient.DateOfBirth > DateTime.Today)
-            {
-                throw new Exception("Date of Birth cannot be a future date.");
-            }
-
-            _patientRepository.Update(patient);
         }
 
-      
-
-        public int GetAppointmentCount(
-            int patientId)
+        public async Task<IEnumerable<PatientDto>> SearchByNameAsync(string name)
         {
-            return _patientRepository
-                .GetAppointmentCount(patientId);
+            var response = await _httpClient.GetAsync(
+                $"patients/search?name={name}");
+
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<PatientDto>>(data);
+        }
+
+        public async Task<int> GetAppointmentCountAsync(int patientId)
+        {
+            var response = await _httpClient.GetAsync(
+                $"patients/{patientId}/appointments/count");
+
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<int>(data);
         }
     }
+
 }

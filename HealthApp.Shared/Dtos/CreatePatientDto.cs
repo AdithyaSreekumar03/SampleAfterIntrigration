@@ -16,5 +16,6 @@ namespace HealthAppWebAPI.Models.Dtos
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; }
+        public string InsuranceId { get; set; }
     }
 }

@@ -1,17 +1,15 @@
 ﻿using HealthAppMVC.Models;
+using HealthAppWebAPI.Models.Dtos;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HealthAppMVC.Services.Interface
 {
+
     public interface IHealthRecordService
     {
-        List<HealthRecord> GetPatientHistory(
-            int patientId);
-
-        HealthRecord GetRecordById(
-            int recordId);
-
-        HealthRecord AddHealthRecord(
-     HealthRecord record);
+        Task<IEnumerable<HealthRecordDto>> GetAllAsync();
+        Task<HealthRecordDto> GetByIdAsync(int id);
+        Task AddHealthRecordAsync(CreateHealthRecordDto dto);
     }
 }

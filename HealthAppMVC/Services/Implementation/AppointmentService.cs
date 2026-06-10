@@ -1,181 +1,159 @@
 ﻿using HealthAppMVC.Models;
-using HealthAppMVC.Repository.Interface;
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace HealthAppMVC.Services.Implementation
 {
-    public class AppointmentService
-       : IAppointmentService
+
+
+    public class AppointmentService : IAppointmentService
     {
-        private readonly IAppointmentRepository
-            _appointmentRepository;
+        private readonly HttpClient _httpClient;
 
-        public AppointmentService(
-            IAppointmentRepository appointmentRepository)
+        public AppointmentService(HttpClient httpClient)
         {
-            _appointmentRepository =
-                appointmentRepository;
+            _httpClient = httpClient;
         }
 
-        public IEnumerable<Appointment>
-            GetAllAppointments()
+        public async Task<IEnumerable<AppointmentDto>> GetAllAppointmentsAsync()
         {
-            return _appointmentRepository.GetAll();
+            var response = await _httpClient.GetAsync("appointments");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
         }
 
-        public Appointment GetAppointmentById(
-            int id)
+        public async Task<AppointmentDto> GetAppointmentByIdAsync(int id)
         {
-            Appointment appointment =
-                _appointmentRepository.GetById(id);
+            var response = await _httpClient.GetAsync($"appointments/{id}");
 
-            if (appointment == null)
-            {
-                throw new Exception(
-                    "Appointment not found.");
-            }
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Appointment not found.");
 
-            return appointment;
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<AppointmentDto>(data);
         }
 
-        public void BookAppointment(
-            Appointment appointment)
+        public async Task BookAppointmentAsync(CreateAppointmentDto dto)
         {
-            if (appointment.ScheduledDate.Date <
-                DateTime.Today)
+            var response = await _httpClient.PostAsJsonAsync("appointments", dto);
+
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Past dates are not allowed.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            bool available =
-                _appointmentRepository
-                .IsSlotAvailable(
-                    appointment.DoctorId,
-                    appointment.ScheduledDate
-                        .ToString("yyyy-MM-dd"),
-                    appointment.TimeSlot);
-
-            if (!available)
-            {
-                throw new Exception(
-                    "Selected slot is already booked.");
-            }
-
-            if (_appointmentRepository
-       .IsDoctorSlotBooked(
-           appointment.DoctorId,
-           appointment.ScheduledDate,
-           appointment.TimeSlot))
-            {
-                throw new Exception(
-                    "Selected doctor already has an appointment in this slot.");
-            }
-
-            if (_appointmentRepository
-       .HasPatientAppointmentOnDate(
-           appointment.PatientId,
-           appointment.DoctorId,
-           appointment.ScheduledDate))
-            {
-                throw new Exception(
-                    "Patient already has an appointment with this doctor on the selected date.");
-            }
-
-            if (_appointmentRepository
-       .HasPatientSlotConflict(
-           appointment.PatientId,
-           appointment.ScheduledDate,
-           appointment.TimeSlot))
-            {
-                throw new Exception(
-                    "Patient already has another appointment during this time slot.");
-            }
-
-
-
-            appointment.Status =
-                AppointmentStatus.Pending;
-
-            _appointmentRepository
-                .Add(appointment);
         }
 
-        public void ConfirmAppointment(
-            int appointmentId)
+        public async Task ConfirmAppointmentAsync(int appointmentId)
         {
-            Appointment appointment =
-                _appointmentRepository
-                .GetById(appointmentId);
+            var response = await _httpClient.PostAsync(
+                $"appointments/{appointmentId}/confirm", null);
 
-            if (appointment == null)
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Appointment not found.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            _appointmentRepository
-                .UpdateStatus(
-                    appointmentId,
-                    AppointmentStatus.Confirmed,
-                    null);
         }
 
-        public void CancelAppointment(
-            int appointmentId,
-            string reason)
+        public async Task CancelAppointmentAsync(int appointmentId, string reason)
         {
-            Appointment appointment =
-                _appointmentRepository
-                .GetById(appointmentId);
-
-            if (appointment.Status == AppointmentStatus.Completed)
+            var dto = new CancelAppointmentDto
             {
-                throw new Exception("Completed appointments cannot be cancelled.");
-            }
+                CancellationReason = reason
+            };
 
-            if (appointment == null)
+            var response = await _httpClient.PostAsJsonAsync(
+                $"appointments/{appointmentId}/cancel", dto);
+
+            if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
-                    "Appointment not found.");
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
             }
-
-            if (string.IsNullOrWhiteSpace(reason))
-            {
-                throw new Exception(
-                    "Cancellation reason is required.");
-            }
-
-            _appointmentRepository
-                .UpdateStatus(
-                    appointmentId,
-                    AppointmentStatus.Cancelled,
-                    reason);
         }
 
-       
-
-        public IEnumerable<Appointment>
-            GetAppointmentsByPatient(
-            int patientId)
+        public async Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientAsync(int patientId)
         {
-            return _appointmentRepository
-                .GetAppointmentsByPatient(
-                    patientId);
+            var response = await _httpClient.GetAsync($"appointments/patient/{patientId}");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
         }
 
-        public IEnumerable<Appointment>
-            GetAppointmentsByDoctor(
-            int doctorId)
+        public async Task<IEnumerable<AppointmentDto>> GetAppointmentsByDoctorAsync(int doctorId)
         {
-            return _appointmentRepository
-                .GetAppointmentsByDoctor(
-                    doctorId);
+            var response = await _httpClient.GetAsync($"appointments/doctor/{doctorId}");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
+        }
+
+        public async Task<IEnumerable<AppointmentDto>> GetUpcomingAppointmentsAsync()
+        {
+            var response = await _httpClient.GetAsync("appointments/upcoming");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
+        }
+
+        public async Task<IEnumerable<AppointmentDto>> GetUpcomingAppointmentsByDoctorAsync(int doctorId)
+        {
+            var response = await _httpClient.GetAsync($"appointments/upcoming/doctor/{doctorId}");
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
+        }
+
+        public async Task<IEnumerable<string>> GetAvailableSlotsAsync(int doctorId, DateTime scheduledDate)
+        {
+            string date = scheduledDate.ToString("yyyy-MM-dd");
+
+            var response = await _httpClient.GetAsync(
+                $"appointments/slots?doctorId={doctorId}&date={date}");
+
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<string>>(data);
+        }
+
+        public async Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientNameAsync(string patientName)
+        {
+            var response = await _httpClient.GetAsync(
+                $"appointments/search?patientName={patientName}");
+
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<AppointmentDto>>(data);
+        }
+
+        public async Task<bool> HealthRecordExistsAsync(int appointmentId)
+        {
+            var response = await _httpClient.GetAsync(
+                $"appointments/{appointmentId}/healthrecord");
+
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<bool>(data);
         }
     }
+
 }

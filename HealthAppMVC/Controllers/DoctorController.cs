@@ -1,194 +1,182 @@
 ﻿using HealthAppMVC.Models;
 using HealthAppMVC.Services.Interface;
+using HealthAppWebAPI.Models.Dtos;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace HealthAppMVC.Controllers
 {
+
     public class DoctorController : Controller
     {
         private readonly IDoctorService _doctorService;
 
-        public DoctorController(
-            IDoctorService doctorService)
+        public DoctorController(IDoctorService doctorService)
         {
             _doctorService = doctorService;
         }
 
-        // GET: Doctor
-        public ActionResult Index(
-            string specialisation = "")
+        public async Task<ActionResult> Index(string specialisation = "")
         {
-            var doctors =
-                _doctorService.GetAllDoctors();
+            var doctors = await _doctorService.GetAllDoctorsAsync();
 
-            if (!string.IsNullOrEmpty(
-                specialisation))
+            if (!string.IsNullOrEmpty(specialisation))
             {
-                SpecialisationType sp;
-
-                if (Enum.TryParse(
-                    specialisation,
-                    out sp))
-                {
-                    doctors =
-                        _doctorService
-                        .SearchBySpecialisation(sp);
-                }
+                doctors = await _doctorService
+                    .SearchBySpecialisationAsync(specialisation);
             }
 
             ViewBag.Specialisations =
-                Enum.GetValues(
-                    typeof(SpecialisationType));
+                Enum.GetValues(typeof(SpecialisationType));
 
             return View(doctors);
         }
 
-        // GET: Doctor/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
             try
             {
-                Doctor doctor =
-                    _doctorService
-                    .GetDoctorById(id);
-
+                var doctor = await _doctorService.GetDoctorByIdAsync(id);
                 return View(doctor);
             }
             catch (Exception ex)
             {
-                TempData["Error"] =
-                    ex.Message;
-
-                return RedirectToAction(
-                    "Index");
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // GET: Doctor/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Doctor/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(
-            Doctor doctor)
+        public async Task<ActionResult> Create(CreateDoctorDto dto)
         {
             if (!ModelState.IsValid)
-            {
-                return View(doctor);
-            }
+                return View(dto);
 
             try
             {
-                _doctorService
-                    .AddDoctor(doctor);
+                await _doctorService.AddDoctorAsync(dto);
 
-                TempData["Success"] =
-                    "Doctor added successfully.";
-
-                return RedirectToAction(
-                    "Index");
+                TempData["Success"] = "Doctor Registered Successfully";
+                return RedirectToAction("DoctorServices", "Home");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    "",
-                    ex.Message);
-
-                return View(doctor);
+                ModelState.AddModelError("", ex.Message);
+                return View(dto);
             }
         }
 
-        // GET: Doctor/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
             try
             {
-                Doctor doctor =
-                    _doctorService
-                    .GetDoctorById(id);
-
+                var doctor = await _doctorService.GetDoctorByIdAsync(id);
                 return View(doctor);
             }
             catch (Exception ex)
             {
-                TempData["Error"] =
-                    ex.Message;
-
-                return RedirectToAction(
-                    "Index");
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("DoctorServices", "Home");
             }
         }
 
-        // POST: Doctor/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(
-            Doctor doctor)
+        public async Task<ActionResult> Edit(int id, CreateDoctorDto dto)
         {
             if (!ModelState.IsValid)
-            {
-                return View(doctor);
-            }
+                return View(dto);
 
             try
             {
-                _doctorService
-                    .UpdateDoctor(doctor);
+                await _doctorService.UpdateDoctorAsync(id, dto);
 
-                TempData["Success"] =
-                    "Doctor updated successfully.";
-
-                return RedirectToAction(
-                    "Index");
+                TempData["Success"] = "Doctor Details Updated Successfully";
+                return RedirectToAction("DoctorServices", "Home");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    "",
-                    ex.Message);
-
-                return View(doctor);
+                ModelState.AddModelError("", ex.Message);
+                return View(dto);
             }
         }
 
-        // GET: Doctor/ChangeStatus/5
-        public ActionResult ChangeStatus(
-            int id)
+        public async Task<ActionResult> ChangeStatus(int id)
         {
             try
             {
-                Doctor doctor =
-                    _doctorService
-                    .GetDoctorById(id);
+                var doctor = await _doctorService.GetDoctorByIdAsync(id);
 
-                bool newStatus =
-                    !doctor.IsActive;
+                bool newStatus = !doctor.IsActive;
 
-                _doctorService
-                    .ChangeDoctorStatus(
-                        id,
-                        newStatus);
+                await _doctorService
+                    .ChangeDoctorStatusAsync(id, newStatus);
 
-                TempData["Success"] =
-                    "Doctor status updated.";
+                TempData["Success"] = "Doctor status updated.";
 
-                return RedirectToAction(
-                    "Index");
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                TempData["Error"] =
-                    ex.Message;
-
-                return RedirectToAction(
-                    "Index");
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
             }
         }
+
+        public ActionResult SearchDoctor()
+        {
+            return View();
+        }
+
+        public async Task<JsonResult> SearchDoctorNames(string term)
+        {
+            var doctors = await _doctorService.SearchByNameAsync(term);
+
+            var result = doctors.Select(d => new
+            {
+                label = d.FullName,
+                value = d.DoctorId
+            });
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult EditDoctorByName(int id)
+        {
+            return RedirectToAction("Edit", new { id = id });
+        }
+
+        public async Task<ActionResult> DoctorSearch(
+            string doctorName,
+            string specialisation)
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
+
+            if (!string.IsNullOrWhiteSpace(doctorName))
+            {
+                doctors = doctors.Where(d =>
+                    d.FullName.ToLower()
+                    .Contains(doctorName.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(specialisation))
+            {
+                doctors = doctors
+                    .Where(d => d.Specialisation
+                    .Equals(specialisation,
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            return View(doctors);
+        }
+
     }
 }
